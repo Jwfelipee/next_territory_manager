@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import clsx from 'clsx';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { ReactNode, useCallback, useEffect } from 'react';
 import { User } from 'react-feather';
 import { useRecoilState, useRecoilValue } from 'recoil';

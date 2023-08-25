@@ -1,8 +1,8 @@
-import type { Config } from 'tailwindcss';
 import defaultTheme from 'tailwindcss/defaultTheme';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
-  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  content: ['./src/**/*.tsx'],
   theme: {
     extend: {
       fontFamily: {
@@ -52,5 +52,5 @@ export default {
       ...defaultTheme.screens,
     },
   },
-  plugins: [require('@tailwindcss/forms')],
-} satisfies Config;
+  purge: ['./components/**/*.{js,ts,jsx,tsx}', './pages/**/*.{js,ts,jsx,tsx}'],
+}

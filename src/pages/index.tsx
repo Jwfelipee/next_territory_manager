@@ -4,29 +4,32 @@ import clsx from 'clsx';
 import jwt_decode from 'jwt-decode';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { setCookie } from 'nookies';
 import * as React from 'react';
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 
 import image from '@/assets/territory_green_1.jpg';
+import { env } from '@/constant';
 import { authGateway } from '@/infra/Gateway/AuthGateway';
 import { authState } from '@/states/auth';
 import { loadState } from '@/states/load';
 import { Body, Button, Input } from '@/ui';
-import { notify } from '@/utils/alert';
-import { sleep } from '@/utils/sleep';
+import { notify, sleep } from '@/utils/';
 
 type LoginData = {
   email: string;
   password: string;
 };
 
-export default function HomePage() {
+export default function Login() {
   const [loginData, setLoginData] = React.useState<LoginData>({
-    email: 'lucas@gmail.com',
+    email: 'john@gmail.com',
     password: '123456',
   });
-  const [old, _setAuthState] = useRecoilState(authState);
-  const [__, _setLoadState] = useRecoilState(loadState);
+  const _setAuthState = useSetRecoilState(authState);
+  const _setLoadState = useSetRecoilState(loadState);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -67,14 +70,11 @@ export default function HomePage() {
       mode: 'default',
       roles,
     });
-    // sessionStorage.setItem(env.storage.token, data.token);
-    // sessionStorage.setItem(env.storage.territoryId, territoryId?.toString());
-    // sessionStorage.setItem(env.storage.overseer, overseer || '');
-    // sessionStorage.setItem(env.storage.blockId, blockId?.toString() || '');
-    // sessionStorage.setItem(env.storage.expirationTime, exp?.toString());
-    // sessionStorage.setItem(env.storage.roles, roles.join(','));
     await sleep(1000);
-    // ('/territorios');
+    setCookie(undefined, env.storage.token, data.token, {
+      maxAge: exp - Date.now() / 1000,
+    });
+    router.push('/territorios');
     _setLoadState({ loader: 'none', message: '' });
   };
 
@@ -95,7 +95,7 @@ export default function HomePage() {
     };
   };
   return (
-    <main>
+    <main className='border border-red-500'>
       <Head>
         <title>Hi</title>
       </Head>

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { RecoilRoot } from 'recoil';
 
 import '@/styles/globals.css';
 // !STARTERCONF This is for demo purposes, remove @/styles/colors.css import immediately
@@ -16,10 +15,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <RecoilRoot>
-      <html>
-        <body>{children}</body>
-      </html>
-    </RecoilRoot>
+    <html>
+      <body>{children}</body>
+    </html>
   );
 }

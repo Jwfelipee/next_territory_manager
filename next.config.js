@@ -3,16 +3,9 @@ const nextConfig = {
   eslint: {
     dirs: ['src'],
   },
-
-  reactStrictMode: true,
-  swcMinify: true,
-
-  // Uncoment to add domain whitelist
-  // images: {
-  //   domains: [
-  //     'res.cloudinary.com',
-  //   ],
-  // },
+  images: {
+    unoptimized: true,
+  },
 
   webpack(config) {
     // Grab the existing rule that handles SVG imports

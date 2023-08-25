@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
+import { parseCookies } from "nookies";
 import { atom } from "recoil";
+
+import { env } from '@/constant/env'
 
 
 type AuthState = {
@@ -15,10 +18,13 @@ type AuthState = {
  
 type Roles = 'admin' | 'publisher' | 'overseer'
 
+const { token } = env.storage
+const { [token]: tokenCookies } = parseCookies()
+
 export const authState = atom<AuthState>({
    key: 'authState',
    default: {
-      token: '',
+      token: tokenCookies || '',
       overseer: '',
       territoryId: 0,
       blockId: 0,

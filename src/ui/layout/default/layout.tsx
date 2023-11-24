@@ -3,10 +3,10 @@ import clsx from 'clsx';
 import { useRouter } from 'next/router';
 import { ReactNode, useCallback, useEffect } from 'react';
 import { User } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { authState } from '@/states/auth';
-import { notify } from '@/utils/alert';
 
 export interface IDefaultLayoutProps {
   haveParams?: boolean;
@@ -22,10 +22,7 @@ export function DefaultLayout({
   const navigate = useRouter();
 
   const logout = useCallback(() => {
-    notify({
-      title: 'Aceeso negado',
-      message: 'Você não tem permissão para acessar essa página, faça login',
-    });
+    toast.error('Você não tem permissão para acessar essa página, faça login');
     navigate.push('/login');
   }, [navigate]);
 
@@ -48,7 +45,7 @@ export function DefaultLayout({
   //     signatureId
   //   );
   //   if (status > 299) {
-  //     alert('Erro ao buscar assinatura');
+  //     toast.error('Erro ao buscar assinatura');
   //     // logout();
   //     return;
   //   }

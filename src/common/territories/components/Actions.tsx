@@ -1,5 +1,6 @@
+import { Button } from "@material-tailwind/react";
+
 import { IActions, ITerritoryCard } from "@/common/territories/type";
-import { Button } from "@/ui";
 
 interface ActionsProps {
   territoryCard: ITerritoryCard;
@@ -10,36 +11,26 @@ interface ActionsProps {
 export const Actions = ({ territoryCard, actions, changeOverseer }: ActionsProps) => {
   if (territoryCard.signature.key) {
     return (
-      <Button.Root
+      <Button
+        id='admin-revoke-access'
         onClick={() => {
           changeOverseer('')
           actions.revoke(territoryCard.territoryId)
         }}
-        className='!justify-start !px-2 text-xs'
-        variant='secondary'
+        className='bg-primary px-2'
       >
         Revogar acesso
-      </Button.Root>
+      </Button>
     );
   }
   return (
-    <div className='flex w-full justify-end'>
-      {/* <Button.Root
-        variant='secondary'
-        className={clsx(
-          {
-            invisible:
-              !territoryCard.overseer ||
-              territoryCard.signature.key ||
-              territoryCard.overseer === 'Dirigente' ||
-              !territoryCard.hasRounds,
-          },
-          'w-full !px-2 text-xs'
-        )}
-        onClick={(e) => actions.share(territoryCard.territoryId, e)}
-      >
-        Enviar <Share2 size={16} />
-      </Button.Root> */}
-    </div>
+    <Button
+      id='admin-revoke-access'
+      disabled
+      variant="outlined"
+      className='px-2'
+    >
+      Revogar acesso
+    </Button>
   );
 };

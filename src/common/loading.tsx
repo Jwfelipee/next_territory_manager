@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 import { Tooltip } from 'react-tooltip';
 
 import NotFound from "@/pages/not-found";
@@ -21,9 +22,10 @@ export const RootModeScreen = ({ children, mode = 'loading' }: {
   children: React.ReactNode;
   mode: Mode;
 }) => {
-  const projectVersion = 'Alfa 1.0';
+  const projectVersion = 'v1.1.0';
   return (
     <>
+      <Toaster />
       {mode === 'loading' && <Loading />}
       {mode === 'screen' && children}
       {mode === 'not-found' && <NotFound />}
@@ -40,9 +42,7 @@ export const RootModeScreen = ({ children, mode = 'loading' }: {
         openOnClick={true}
         place="top"
       >
-        A versão alfa é a primeira fase de testes de um software.
-        <br />
-        Pode conter muitos bugs.
+        Versão 1.1.0
       </Tooltip>
     </>
   );

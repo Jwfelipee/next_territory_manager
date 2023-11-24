@@ -1,37 +1,38 @@
-import { useRouter as useNavigation } from 'next/navigation';
-import { Eye } from "react-feather";
+import dayjs from "dayjs";
+import { Eye, Share2 } from "react-feather";
+import toast from "react-hot-toast";
 
-import { IActions, ITerritoryCard } from "@/common/territories/type";
+import { ITerritoryCard } from "@/common/territories/type";
+import { ITerritoryActions } from "@/common/territories/useTerritories";
 import { ShareCopy } from "@/common/territory/ShareCopy";
+
+
 
 interface HeaderButtonsProps {
   territoryCard: ITerritoryCard;
-  actions: IActions;
+  actions: ITerritoryActions;
 }
 
 export const HeaderButtons = ({ territoryCard, actions }: HeaderButtonsProps) => {
-  const navigation = useNavigation();
-  const blockNavigation = () => {
-    navigation.push(`/territorio/${territoryCard.territoryId}`);
-  }
+
   return (
     <div className='flex items-center justify-end gap-2'>
-      {territoryCard?.signature?.key && (<Eye className='cursor-pointer' onClick={blockNavigation} />)}
+      {territoryCard?.signature?.key && (<Eye className='cursor-pointer' onClick={() => actions.blockNavigation(territoryCard.territoryId)} />)}
       {
-        territoryCard.overseer && territoryCard.signature.expirationDate && (
+        territoryCard.overseer && territoryCard.signature.expirationDate ? (
           <ShareCopy
-            actions={{ share: actions.share }}
+            actions={actions}
             id={territoryCard.territoryId}
             message={{
-              title: `Território para trabalhar até ${new Date(territoryCard.signature.expirationDate + ' GMT-3').toLocaleDateString()}`,
+              title: `*DESIGNAÇÃO DE TERRITÓRIO*`,
               url: `${origin}/home?p=territorio/${territoryCard.territoryId}&s=${territoryCard?.signature?.key}`,
-              text: `Prezado irmão *_${territoryCard.overseer}_*\nsegue o link para o território *${territoryCard.name}* que você irá trabalhar até ${new Date(
-                territoryCard.signature.expirationDate + ' GMT-3'
-              ).toLocaleDateString()} \n\n\r`,
+              text: `*DESIGNAÇÃO DE TERRITÓRIO*\n\nPrezado irmão *_${territoryCard.overseer}_*\nsegue o link para o território *${territoryCard.name}* que você irá trabalhar até ${dayjs(territoryCard.signature.expirationDate).format('DD/MM/YYYY')} \n\n\r`,
             }}
             signatureKey={territoryCard?.signature?.key as string}
             key={territoryCard.territoryId}
           />
+        ) : (
+          <Share2 id="overseer-share" onClick={() => toast.error('Não é possível compartilhar um território sem dirigente ou data de expiração')} size={24} />
         )
       }
     </div>

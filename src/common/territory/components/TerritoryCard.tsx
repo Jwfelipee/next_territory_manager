@@ -1,59 +1,58 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import clsx from 'clsx';
-import { useRouter as useNavigation } from 'next/navigation';
 import { memo, useCallback, useEffect, useState } from 'react';
-import { Eye, User, Users } from 'react-feather';
+import { Clock, Eye, User, Users } from 'react-feather';
 
 import { ShareCopy } from '@/common/territory/ShareCopy';
+import { ITerritoryActions } from '@/common/territory/useTerritoryActions';
 import { DoughnutChart } from '@/ui/doughnutChart';
 
-import { IActions, IBlock } from '../type';
+import { IBlock } from '../type';
 
 interface BlockCardProps {
   block: IBlock;
   index: number;
-  actions: IActions;
-  territoryId: number;
+  actions: ITerritoryActions;
+  territoryId: string;
+  round: string;
 }
 
-export function BlockCard({ block, actions, territoryId }: BlockCardProps) {
-  const navigation = useNavigation();
+export function BlockCard({ block, actions, territoryId, round }: BlockCardProps) {
+
   function sugestion(): string {
     let sugestion = '';
     if (block.negativeCompleted < 15) {
       sugestion = '+1 quadra';
     }
     if (block.negativeCompleted >= 15 && block.negativeCompleted < 25) {
-      sugestion = '2 pares';
+      sugestion = '2 pares ou mais.';
     }
     if (block.negativeCompleted >= 25 && block.negativeCompleted < 30) {
-      sugestion = '3 pares';
+      sugestion = '3 pares ou mais.';
     }
-    if (block.negativeCompleted >= 30 && block.negativeCompleted < 60) {
-      sugestion = '4 pares';
+    if (block.negativeCompleted >= 30) {
+      sugestion = '4 pares ou mais.';
     }
     return sugestion;
   }
 
-  const blockNavigation = () => {
-    navigation.push(`/territorio/${territoryId}/quadra/${block.id}`);
-  }
-
   return (
-    <div className={clsx('flex min-h-[260px] w-full rounded-b-[40px] rounded-l-[40px] rounded-t-[40px] rounded-br-none rounded-tr-none border p-3 shadow-lg')}>
+    <div className={clsx('flex min-h-[260px] w-full rounded-b-[40px] rounded-l-[40px] gap-2 rounded-t-[40px] rounded-br-none rounded-tr-none border p-3 shadow-lg')}>
       <div className='flex h-full w-1/2 flex-col items-baseline justify-start'>
         <h6 className='ml-2 block text-xl font-medium'>
           <span className='ml-2'>{block.name}</span>
         </h6>
 
-        <div className='flex h-[200px] w-full max-w-[170px] flex-col pt-3'>
+        <div id="overseer-chart" className='flex h-[200px] w-full max-w-[170px] flex-col pt-3'>
           <DoughnutChart values={[block.positiveCompleted, block.negativeCompleted]} />
         </div>
         <div className='w-full'>
           {!block.signature?.key ? (
-            <div className='flex w-full items-center justify-center gap-2'>Sugestão: {sugestion()}</div>
+            <div id="overseer-time" className='p-1 pl-2 flex w-full  items-center  gap-2'>
+              <Clock className='text-gray-700' />
+            </div>
           ) : (
-            <div className='flex w-full items-center justify-center gap-2'>
+            <div className='flex w-full gap-2'>
               <TimeToExpire signature={block.signature} />
             </div>
           )}
@@ -62,13 +61,13 @@ export function BlockCard({ block, actions, territoryId }: BlockCardProps) {
 
       <div className='flex w-1/2 flex-col items-end justify-between'>
         <div className='flex w-full justify-end items-center gap-2'>
-          {block?.signature?.key && (<Eye className='cursor-pointer' onClick={blockNavigation} />)}
+          {block?.signature?.key && (<Eye className='cursor-pointer' onClick={() => actions.blockNavigation(territoryId, block.id, round)} />)}
           <ShareCopy
             actions={actions}
             id={block.id}
             message={{
-              title: 'Prezado(a) publicador(a)',
-              text: 'Segue o link para a quadra que você está designado(a) para pregar:',
+              title: '*DESIGNAÇÃO DE TERRITÓRIO*\n\nPrezado(a) publicador(a)',
+              text: '*DESIGNAÇÃO DE TERRITÓRIO*\n\nSegue o link para a quadra que você está designado(a) para pregar:',
               url: `${window.location.origin}/home?p=territorio/${territoryId}/quadra/${block.id}&s=${block.signature?.key}`,
             }}
             signatureKey={block?.signature?.key}
@@ -76,7 +75,7 @@ export function BlockCard({ block, actions, territoryId }: BlockCardProps) {
           />
         </div>
 
-        <div className='flex w-full flex-col gap-2 p-4'>
+        <div className='flex w-full flex-col gap-2 p-2'>
           <div className='flex items-center gap-2'>
             <div className='bg-secondary h-6 w-14'></div>
             <span>À fazer: {block.negativeCompleted}</span>
@@ -86,21 +85,24 @@ export function BlockCard({ block, actions, territoryId }: BlockCardProps) {
             <div className='bg-primary h-6 w-14'></div>
             <span>Concluído: {block.positiveCompleted}</span>
           </div>
+          <div id="overseer-sugestion" className='text-sm'>Sugestão: {sugestion()}</div>
         </div>
 
-        <div className='flex w-full'>
+        <div className='flex w-full '>
           {block?.signature?.key ? (
-            <div className='flex w-full items-end justify-end gap-2 p-2 font-semibold'>
-              {block.connections}
-              {block.connections === 1 ? <User className='stroke-primary fill-primary' /> : <Users className='stroke-primary fill-primary' />}
+            <div className='flex w-full items-center justify-end gap-2 p-2 font-semibold'>
+              {block.connections >= 1 && (<span className='text-lg'>{block.connections}</span>)}
+              {block.connections >= 1 ? <Users id="overseer-connections" className='stroke-primary fill-primary' /> : <User id="overseer-connections" className='stroke-primary fill-primary' />}
               {/* <div className='h-2 w-2 animate-pulse rounded-full bg-green-700'></div> */}
             </div>
           ) : (
-            <div className='mb-2 p-4'></div>
+            <div className='flex w-full items-center justify-end gap-2 p-2 font-semibold'>
+              <User id="overseer-connections" className='stroke-gray-500 fill-gray-500' />
+            </div>
           )}
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
@@ -135,9 +137,8 @@ const TimeToExpireComponent = ({ signature }: { signature: IBlock['signature'] }
   }, [signature, signature?.expirationDate, timeToExpire]);
 
   return (
-    <div className='mb-1 flex w-full flex-col items-center justify-center gap-1'>
-      <span className='text-md'>Tempo restante:</span>
-      <span className='text-md font-semibold'>{expireIn}</span>
+    <div id="overseer-time" className='p-1 pl-2 flex w-full  items-center  gap-2'>
+      <Clock className='text-primary' /> <span className='text-lg  font-semibold'>{expireIn}</span>
     </div>
   );
 };

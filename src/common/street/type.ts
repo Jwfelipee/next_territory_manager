@@ -4,7 +4,7 @@ export type IUseStreet = {
 };
 
 export type IActions = {
-  mark: (id: number) => Promise<void>;
+  mark: (id: string) => Promise<void>;
 };
 
 export type Street = {
@@ -15,10 +15,10 @@ export type Street = {
 };
 
 export type House = {
-  id: number;
+  id: string;
   number: string;
   complement: string | null;
-  order: number;
+  order: string;
   legend: string;
   status: boolean;
 };

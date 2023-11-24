@@ -1,17 +1,20 @@
 import { useState } from "react";
 import { Check, Copy, Share2 } from "react-feather";
 
-import { navigatorShare } from "@/utils/share";
+import { ITerritoryActions } from "@/common/territory/useTerritoryActions";
 
 interface ShareProps {
-  id: number;
+  id: string;
   signatureKey?: string;
   message: {
     title: string;
     text: string;
     url: string;
   };
-  actions: { share(id: number): void };
+  actions: {
+    share: (id: string) => Promise<void>;
+    copyShare: (id: string) => Promise<void>;
+  }
 }
 
 export function ShareCopy(props: ShareProps) {
@@ -22,14 +25,14 @@ export function ShareCopy(props: ShareProps) {
 
   async function copyToClipboard() {
     setCopySuccess(true);
-    await navigatorShare({ title, text, url, });
+    actions.copyShare(id)
     setTimeout(() => {
       setCopySuccess(false);
     }, 7000)
   };
 
   return (
-    <div className='p-2 cursor-pointer mr-2'>
+    <div id="overseer-share" className='p-2 cursor-pointer'>
       {
         signatureKey ? (<CopyComponent copySuccess={copySuccess} onClick={copyToClipboard} />) : (<Share2 onClick={() => actions.share(id)} size={24} />)
       }

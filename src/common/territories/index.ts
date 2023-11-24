@@ -1,3 +1,3 @@
-export * from './components'
-export * from './type'
-export * from './useHome'
+export * from './components';
+export * from './type';
+export * from './useTerritories';

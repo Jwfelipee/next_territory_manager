@@ -28,8 +28,8 @@ const DoughnutChartComponent = ({ labels, values, backgroundColor, borderColor }
           {
             label: '#',
             data: values,
-            backgroundColor: backgroundColor ?? ['#9EE073', '#CBE6BA'],
-            borderColor: borderColor ?? ['#9EE073', '#CBE6BA'],
+            backgroundColor: backgroundColor ?? ['#5B98AB', '#CEE1E6'],
+            borderColor: borderColor ?? ['#5B98AB', '#CEE1E6'],
             borderWidth: 1,
           },
         ],

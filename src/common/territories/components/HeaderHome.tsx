@@ -1,49 +1,49 @@
-import clsx from 'clsx';
-import { Search } from 'react-feather';
+import { Input } from "@material-tailwind/react";
+import { driver } from "driver.js";
+import Image from 'next/image';
+import { Info, Search } from 'react-feather';
 
-import { Header, Input } from '@/ui';
+import "driver.js/dist/driver.css";
 
+import image from '@/assets/territory_green_1.jpg';
 interface IHeaderHomeProps {
   search: string;
   handleChangeSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  submitSearch: () => void;
+  children?: React.ReactNode;
 }
 
 export function HeaderHome({
   search,
   handleChangeSearch,
-  submitSearch,
+  children
 }: IHeaderHomeProps) {
-  const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      submitSearch();
-    }
-  };
+
+
 
   return (
-    <Header>
-      <div className='flex h-full flex-col justify-evenly p-4'>
-        <h1 className='text-xl font-semibold'>Olá admin</h1>
-        <p className='text-sm'>
-          Gerencie aqui os Territórios digitais e compartilhe com os dirigentes
-          do campo.
-        </p>
-        <div
-          className={clsx(
-            'flex w-full items-center justify-center gap-1 mt-2 transition-all duration-300 ease-in-out'
-          )}
-        >
-          <Input
-            placeholder='Pesquise o território'
-            className='border-white'
-            value={search}
-            onChange={handleChangeSearch}
-            enterKeyHint='search'
-            onKeyDown={handleSearch}
-          />
-          <Search size={16} />
+    <div className='p-2 py-4'>
+      <div className='flex justify-between items-center'>
+        <div className='flex gap-2 items-center'>
+          <div className='w-[50px] overflow-hidden rounded-full '>
+            <Image src={image} alt='logo' className='w-full' />
+          </div>
+
+          <div className="w-40 mini:w-60 md:96">
+            <Input
+              id="admin-filter-search"
+              label='Pesquise o território'
+              className='shadow-md w-full'
+              value={search}
+              onChange={handleChangeSearch}
+              icon={<Search size={16} />}
+              autoFocus
+            />
+          </div>
+
         </div>
+        {children}
       </div>
-    </Header>
+    </div>
+
   );
 }

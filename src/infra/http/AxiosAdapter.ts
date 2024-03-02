@@ -7,8 +7,20 @@ import { parseCookies } from 'nookies';
 import { env } from '@/constant';
 
 import type HttpClient from './HttpClient';
-
+// export const URL_API = 'http://localhost:3001/v1';
 export const URL_API = 'https://territory-manager.com.br/v1';
+
+type AxiosResponse<T> =
+  | {
+      status: number;
+      data: T;
+      message?: undefined;
+    }
+  | {
+      status: any;
+      message: any;
+      data?: undefined;
+    };
 
 export default class AxiosAdapter implements HttpClient {
   constructor() {
@@ -23,9 +35,9 @@ export default class AxiosAdapter implements HttpClient {
     });
   }
 
-  async get(url: string) {
+  async get<T>(url: string) {
     const httpConfig = { method: 'get' };
-    return await this.axiosConfig(url, httpConfig);
+    return await this.axiosConfig<T>(url, httpConfig);
   }
 
   async post(url: string, data: any) {
@@ -53,7 +65,7 @@ export default class AxiosAdapter implements HttpClient {
     return await this.axiosConfig(url, httpConfig);
   }
 
-  private async axiosConfig(url: string, httpConfig: any) {
+  private async axiosConfig<T>(url: string, httpConfig: any): Promise<AxiosResponse<T>> {
     try {
       const config = {
         ...httpConfig,
@@ -81,7 +93,6 @@ export default class AxiosAdapter implements HttpClient {
         },
       };
       const response = await axios(`${URL_API}/${url}`, config);
-      console.log(response);
       return {
         status: response?.status,
         data: response?.data,

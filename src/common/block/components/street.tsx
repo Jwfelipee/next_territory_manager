@@ -13,18 +13,21 @@ interface AddressProps {
   actions: IActions;
 }
 
+// regex para remover todas as letras do house e manter apenas os numeros
+
+const regex = /\D/g;
+
 export function Street({ address, actions, block }: AddressProps) {
-  const FIRST_HOUSE = address?.houses[0];
-  const LAST_HOUSE = address?.houses[address?.houses.length - 1];
+  const houses = address.houses.filter((house) => !regex.test(house));
+  const FIRST_HOUSE = houses[0];
+  const LAST_HOUSE = houses[houses.length - 1];
   const [url, setUrl] = useState<string>('');
 
   const addressTo = useCallback(() => {
-    const [_, territoryNameRaw] = block.territoryName.split('-');
-    const territoryName = territoryNameRaw.trim().replace(/\d/g, '');
-    const middleHouse = Math.round(address?.houses.length / 2);
-    const loc = `${territoryName} ${address.name} ${address?.houses[middleHouse]}`;
+    const middleHouse = Math.round(houses.length / 2);
+    const loc = `${address.name} ${houses[middleHouse]} - Sorocaba - SP`;
     return loc;
-  }, [address, block.territoryName]);
+  }, [address]);
 
   const toMapsWithNavigator = useCallback(() => {
     if ('geolocation' in navigator) {
@@ -70,23 +73,28 @@ export function Street({ address, actions, block }: AddressProps) {
   return (
     <div
       className={clsx(
-        'flex h-24 w-full items-center justify-center gap-3 rounded-b-[40px] rounded-l-[40px] rounded-t-[40px] rounded-br-none rounded-tr-none bg-white p-2 shadow-sm drop-shadow-xl '
+        'flex h-20 mini:h-24 w-full items-center justify-center gap-3 rounded-b-[40px] rounded-l-[40px] rounded-t-[40px] rounded-br-none rounded-tr-none bg-white p-2 pl-4 shadow-sm drop-shadow-xl '
       )}
     >
-      {url ? (<a className='flex cursor-pointer flex-col items-center rounded-full bg-[#DDF5CE] p-2' href={url} target='_blank'>
-        <div className='flex h-6 w-6 items-center justify-center fill-zinc-600'>
+      {url ? (<a className='flex cursor-pointer flex-col items-center rounded-full bg-[#CEE1E6] p-2' href={url} target='_blank'>
+        <div id='publisher-gps' className='flex h-7 w-7 items-center justify-center fill-zinc-600'>
           <CarIcon />
         </div>
       </a>) : (<div className='p-2' />)}
       <div onClick={() => void actions.goToStreet(address.id)} className={clsx('flex w-11/12 cursor-pointer flex-col items-start')}>
-        <h6 className='inline-block w-full max-w-[250px] truncate text-xl font-semibold text-gray-900'>{address.name}</h6>
+        <h6 className='inline-block w-full max-w-[220px] mini:max-w-[250px] truncate text-xl font-semibold text-gray-900'>{address.name}</h6>
         <p className='text-lg text-gray-600'>
           N° de {FIRST_HOUSE} à {LAST_HOUSE}
         </p>
       </div>
       <Button.Root
+        id="publisher-details"
         variant='ghost'
-        className={clsx('!shadow-non text-primary flex h-8 w-1/12 items-center justify-center shadow-none !p-0 font-bold')}
+        className="
+          hidden 
+          h-8 w-1/12 !p-0 mr-2 font-bold text-primary !shadow-non  shadow-none  
+          mini:flex  mini:justify-center mini:items-center
+        "
         onClick={() => void actions.goToStreet(address.id)}
       >
         <Button.Icon icon={NavigateNext} size={24} />

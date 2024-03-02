@@ -8,9 +8,10 @@ export type IActions = {
 };
 
 export type IBlock = {
-  territoryId: number;
+  territoryId: string;
   territoryName: string;
-  blockId: number;
+  imageUrl?: string;
+  blockId: string;
   blockName: string;
   addresses: IAddress[];
 };

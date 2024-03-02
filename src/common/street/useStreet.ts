@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useRecoilState } from 'recoil';
 
 import { Mode } from '@/common/loading';
@@ -7,7 +8,7 @@ import { authState } from '@/states/auth';
 
 import { Street } from './type';
 
-export const useStreet = (addressId: number, blockId: number, territoryId: number) => {
+export const useStreet = (addressId: string, blockId: string, territoryId: string, round: string) => {
   const [isLoading, setIsLoading] = useState<Mode>('loading');
   const [street, setStreet] = useState<Street>({
     streetName: '',
@@ -18,12 +19,13 @@ export const useStreet = (addressId: number, blockId: number, territoryId: numbe
   const [values, setValues] = useRecoilState(authState);
 
   const getStreet = useCallback(
-    async (addressId: number, blockId: number, territoryId: number) => {
+    async (addressId: string, blockId: string, territoryId: string, round: string) => {
       if (!addressId || !blockId || !territoryId) return;
-      const { data, status } = await streetGateway.signInStreet({
+      const { data, status } = await streetGateway.getStreetHouses({
         addressId,
         blockId,
         territoryId,
+        round,
       });
       if (status > 299) {
         setValues({ ...values, notFoundStatusCode: status });
@@ -39,10 +41,19 @@ export const useStreet = (addressId: number, blockId: number, territoryId: numbe
   );
 
   useEffect(() => {
-    void getStreet(Number(addressId), Number(blockId), Number(territoryId));
-  }, [addressId, blockId, getStreet, territoryId]);
+    void getStreet(addressId, blockId, territoryId, round);
+    return () => {
+      toast.dismiss();
+      setStreet({
+        streetName: '',
+        blockName: '',
+        territoryName: '',
+        houses: [],
+      } as Street);
+    };
+  }, [addressId, blockId, getStreet, round, territoryId]);
 
-  const markRow = async (id: number) => {
+  const markRow = async (id: string) => {
     let statusHouse = false;
     street.houses.forEach((h) => {
       if (h.id === id) {
@@ -58,29 +69,27 @@ export const useStreet = (addressId: number, blockId: number, territoryId: numbe
       territoryId,
       houseId: id,
       status: statusHouse,
-    } as any;
+      round,
+    };
 
     const { status } = await streetGateway.markHouse(input);
     if (status === 403) {
-      alert('Você não tem permissão para alterar o status dessa casa');
       street.houses.map((h) => {
         if (h.id === id) {
           h.status = !h.status;
         }
       });
       setStreet({ ...street });
+      throw new Error('Você não tem permissão para alterar o status dessa casa.');
     }
     if (status === 503) {
-      alert('Servidor indisponível');
       setIsLoading('loading');
-      setTimeout(() => getStreet(addressId, blockId, territoryId), 5000);
-      return;
+      setTimeout(() => getStreet(addressId, blockId, territoryId, round), 5000);
+      throw new Error('Servidor fora do ar.');
     }
   };
 
-  const markRowSocket = (id: number, status: boolean) => {
-    getStreet(Number(addressId), Number(blockId), Number(territoryId));
-  };
+  const markRowSocket = () => getStreet(addressId, blockId, territoryId, round);
 
   return {
     street,

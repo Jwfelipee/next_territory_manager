@@ -1,3 +1,3 @@
-export * from './HeaderHome'
-export * from './SearchButton'
-export * from './TerritoryCard'
+export * from '../../../components/Organisms/TerritoryCard';
+export * from './HeaderHome';
+export * from './SearchButton';

@@ -8,24 +8,22 @@ import { authState } from '@/states/auth';
 
 import { IBlock } from './type';
 
-export const useBlock = (blockId: number, territoryId: number, initialState?: IBlock) => {
-  const [block, setBlock] = useState<IBlock>(
-    initialState || {
-      blockId: 0,
-      blockName: '',
-      territoryId: 0,
-      territoryName: '',
-      addresses: [],
-    }
-  );
+export const useBlock = (blockId: string, territoryId: string, round: string) => {
+  const [block, setBlock] = useState<IBlock>({
+    blockId: '',
+    blockName: '',
+    territoryId: '',
+    territoryName: '',
+    addresses: [],
+  });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<Mode>('loading');
   const [values, setValues] = useRecoilState(authState);
 
   const getBlock = useCallback(
-    async (block: number, territory: number): Promise<void> => {
+    async (block: string, territory: string, round: string): Promise<void> => {
       if (!block || !territory) return;
-      const { status, data } = await blockGateway.getBlock(block, territory);
+      const { status, data } = await blockGateway.getBlock(block, territory, round);
       if (status > 299) {
         setValues({ ...values, notFoundStatusCode: status });
         setIsLoading('not-found');
@@ -38,10 +36,13 @@ export const useBlock = (blockId: number, territoryId: number, initialState?: IB
   );
 
   useEffect(() => {
-    void getBlock(blockId ?? 0, territoryId ?? 0);
-  }, [blockId, getBlock, territoryId]);
+    void getBlock(blockId, territoryId, round);
+  }, [blockId, getBlock, round, territoryId]);
 
-  const goToStreet = (addressId: number): void => void router.push(`/territorio/${territoryId}/quadra/${blockId}/rua/${addressId}`);
+  const goToStreet = (addressId: number): void => {
+    const query = new URLSearchParams({ round });
+    void router.push(`/territorio/${territoryId}/quadra/${blockId}/rua/${addressId}?${query.toString()}`);
+  };
 
   return {
     block,

@@ -1,3 +1,4 @@
+import { Toaster } from 'react-hot-toast';
 import { Tooltip } from 'react-tooltip';
 
 import NotFound from "@/pages/not-found";
@@ -21,9 +22,10 @@ export const RootModeScreen = ({ children, mode = 'loading' }: {
   children: React.ReactNode;
   mode: Mode;
 }) => {
-  const projectVersion = 'Beta 1.0';
+  const projectVersion = 'v1.1.0';
   return (
-    <>
+    <div className='m-auto max-w-[1880px] '>
+      <Toaster />
       {mode === 'loading' && <Loading />}
       {mode === 'screen' && children}
       {mode === 'not-found' && <NotFound />}
@@ -40,10 +42,8 @@ export const RootModeScreen = ({ children, mode = 'loading' }: {
         openOnClick={true}
         place="top"
       >
-        A versão Beta 1.0 representa um estágio avançado de desenvolvimento do software.
-        <br />
-        Pode conter alguns problemas menores.
+        Versão 1.1.0
       </Tooltip>
-    </>
+    </div>
   );
 };

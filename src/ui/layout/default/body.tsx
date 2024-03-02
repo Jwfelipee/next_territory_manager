@@ -8,7 +8,7 @@ export function Body({
   return (
     <>
       <div
-        className={clsx("flex flex-col", className)}
+        className={clsx("flex flex-col w-full h-full", className)}
         {...rest}
       >
         {children}

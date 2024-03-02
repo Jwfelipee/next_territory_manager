@@ -2,78 +2,70 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
 
 import { Mode } from '@/common/loading';
-import { blockGateway } from '@/infra/Gateway/BlockGateway';
+import { ITerritoryActions, useTerritoryActions } from '@/common/territory/useTerritoryActions';
 import { TerritoryGateway } from '@/infra/Gateway/TerritoryGateway';
 import { authState } from '@/states/auth';
-import { navigatorShare } from '@/utils/share';
 
 import { ITerritory } from './type';
 
-export const useTerritory = (territoryId: number, initialState?: ITerritory) => {
-  const [territory, setTerritory] = useState<ITerritory>(
-    initialState || {
-      territoryId: 0,
-      territoryName: '',
-      hasRound: false,
-      blocks: [],
-      history: [],
-    }
-  );
+export interface ITerritoryCustomHook {
+  territory: ITerritory;
+  actions: ITerritoryActions;
+  isLoading: Mode;
+  getTerritories: (id: string, round: string) => Promise<void>;
+}
+
+export const useTerritory = (territoryId: string, round: string): ITerritoryCustomHook => {
+  const [territory, setTerritory] = useState<ITerritory>({
+    territoryId: '',
+    territoryName: '',
+    hasRound: false,
+    blocks: [],
+    history: [],
+  });
   const [isLoading, setIsLoading] = useState<Mode>('loading');
   const [values, setValues] = useRecoilState(authState);
 
-  const getTerritories = useCallback(async (id: number): Promise<void> => {
-    if (!id) {
-      return;
-    }
-    const { status, data } = await TerritoryGateway.in().getById(id);
-    if (status > 299) {
-      setValues({ ...values, notFoundStatusCode: status });
-      setIsLoading('not-found');
-      return;
-    }
-    setTerritory(data);
-    setIsLoading('screen');
-  }, []);
-
-  const share = async (blockId: number): Promise<void> => {
-    const exist = territory.blocks.find((block) => block.id === blockId);
-    if (!exist) {
-      alert('Quadra não encontrado');
-      return;
-    }
-
-    const input = {
-      blockId,
-      territoryId: territory.territoryId,
-    };
-    const { status, data } = await blockGateway.signInBlock(input);
-    if (status > 299) {
-      console.log({ data, status });
-      alert('Erro ao tentar compartilhar a quadra');
-      return;
-    }
-
-    const signature = data.signature as string;
-    await navigatorShare({
-      title: 'Prezado(a) publicador(a)',
-      text: `Segue o link para a *${exist.name}* que você está designado(a) para pregar:`,
-      url: `${window.location.origin}/home?p=territorio/${territory.territoryId}/quadra/${blockId}&s=${signature}`,
-    });
-
-    void getTerritories(territoryId);
-  };
+  const getTerritories = useCallback(
+    async (id: string, round: string): Promise<void> => {
+      if (!id) {
+        return;
+      }
+      const { status, data } = await TerritoryGateway.in().getById(id, round);
+      if (status > 299) {
+        setValues({ ...values, notFoundStatusCode: status });
+        setIsLoading('not-found');
+        return;
+      }
+      setTerritory(data);
+      setIsLoading('screen');
+    },
+    [setValues, values]
+  );
 
   useEffect(() => {
-    getTerritories(territoryId);
-  }, [getTerritories, territoryId]);
+    getTerritories(territoryId, round);
+    return () => {
+      setTerritory({
+        territoryId: '',
+        territoryName: '',
+        hasRound: false,
+        blocks: [],
+        history: [],
+      });
+    };
+  }, [getTerritories, round, territoryId]);
 
   return {
     territory,
-    getTerritories,
-    actions: {
-      share,
-    },
     isLoading,
+    getTerritories,
+    actions: useTerritoryActions({
+      territoryId,
+      territory,
+      setTerritory,
+      getTerritories,
+      round,
+    }),
   };
 };
